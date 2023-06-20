@@ -13,6 +13,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.adapter.TaskAdapter
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.model.TaskModel
@@ -21,9 +22,7 @@ import com.example.myapplication.roomdb.TaskFactory
 import com.example.myapplication.roomdb.TaskViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -54,6 +53,22 @@ class MainActivity : AppCompatActivity() {
 
             showBottomDialog(1, null)
         }
+
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (dy > 10 && binding.fabBtn.isExtended)
+                    binding.fabBtn.shrink()
+
+                if (dy < -10 && !binding.fabBtn.isExtended)
+                    binding.fabBtn.extend()
+
+                if (!binding.recyclerView.canScrollVertically(-1))
+                    binding.fabBtn.extend()
+            }
+        })
     }
 
     private fun showBottomDialog(type: Int, taskModel: TaskModel?) {
