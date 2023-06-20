@@ -253,8 +253,8 @@ class MainActivity : AppCompatActivity() {
         bottomSheetDialog.setContentView(view)
 
         val allDateTv = view.findViewById<AppCompatTextView>(R.id.allDateTv)
-        val completedTv = view.findViewById<AppCompatTextView>(R.id.completedTv)
-        val pendingTv = view.findViewById<AppCompatTextView>(R.id.pendingTv)
+        val currentDateTv = view.findViewById<AppCompatTextView>(R.id.currentDateTv)
+        val otherDateTv = view.findViewById<AppCompatTextView>(R.id.otherDateTv)
         val cancelTv = view.findViewById<AppCompatTextView>(R.id.cancelTv)
 
         allDateTv.setOnClickListener {
@@ -265,7 +265,7 @@ class MainActivity : AppCompatActivity() {
             bottomSheetDialog.dismiss()
         }
 
-        completedTv.setOnClickListener {
+        currentDateTv.setOnClickListener {
             val simNew = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
             val formatNew = simNew.format(Date())
             if (localList.isNotEmpty()) {
@@ -274,7 +274,7 @@ class MainActivity : AppCompatActivity() {
             }
             bottomSheetDialog.dismiss()
         }
-        pendingTv.setOnClickListener {
+        otherDateTv.setOnClickListener {
             val simNew = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
             val formatNew = simNew.format(Date())
             if (localList.isNotEmpty()) {
