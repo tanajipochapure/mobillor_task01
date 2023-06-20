@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -49,15 +51,16 @@ class TaskAdapter(private val userList: List<TaskModel>, private val listener: L
             holder.titleTv.apply {
                 paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
             }
-        }
-        if (taskModel.status == 0) {
-
+        } else {
             val sim = SimpleDateFormat("hh:mm a", Locale.getDefault())
             val format = sim.format(Date())
             val taskTime = taskModel.time
             val parser = SimpleDateFormat("hh:mm a", Locale.getDefault())
             val currentTime = parser.parse(format)?.time
             val deadlineTaskTime = parser.parse(taskTime)?.time
+
+            //  if (taskModel.status == 0) {
+
             if (currentTime != null && deadlineTaskTime != null) {
                 when {
                     currentTime < deadlineTaskTime -> holder.titleTv.setTextColor(Color.BLACK)
@@ -67,18 +70,21 @@ class TaskAdapter(private val userList: List<TaskModel>, private val listener: L
                     else -> holder.titleTv.setTextColor(Color.BLACK)
                 }
             }
-
+            //   }
         }
+        holder.checkBox.setOnCheckedChangeListener(object : OnCheckedChangeListener {
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+                val simNew = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+                val formatNew = simNew.format(Date())
 
-        holder.checkBox.setOnCheckedChangeListener { _, _ ->
-            if (taskModel.status == 0) {
-                listener.onClick(3, taskModel.copy(status = 1))
-            } else {
-                listener.onClick(3, taskModel.copy(status = 0))
+                if (isChecked) {
+                    listener.onClick(3, taskModel.copy(status = 1, date = formatNew))
+                } else {
+                    listener.onClick(3, taskModel.copy(status = 0, date = formatNew))
+                }
             }
-        }
+        })
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view =

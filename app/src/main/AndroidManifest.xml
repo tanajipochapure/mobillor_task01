@@ -26,10 +26,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".AddTaskActivity"
-            android:exported="false" />
-
     </application>
 
 </manifest>

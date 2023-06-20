@@ -4,9 +4,6 @@ import android.app.TimePickerDialog
 import android.app.TimePickerDialog.OnTimeSetListener
 import android.content.Context
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -23,7 +20,10 @@ import com.example.myapplication.roomdb.Listener
 import com.example.myapplication.roomdb.TaskFactory
 import com.example.myapplication.roomdb.TaskViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 
 class MainActivity : AppCompatActivity() {
@@ -83,20 +83,45 @@ class MainActivity : AppCompatActivity() {
             }
             if (type == 2) {
 
+                val sim = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+                val format = sim.format(Date())
+
                 val model = TaskModel(
                     taskModel!!.id, taskModel.status,
                     taskEt.text.toString().trim(),
                     timeEt.text.toString().trim(),
+                    format
                 )
                 Toast.makeText(context, "Task updated successfully", Toast.LENGTH_LONG).show()
                 taskViewModel.updateTask(model)
 
                 bottomSheetDialog.dismiss()
             } else {
+
+                var status = 0
+                val sim = SimpleDateFormat("hh:mm a", Locale.getDefault())
+                val format = sim.format(Date())
+                val taskTime = timeEt.text.toString().trim()
+                val parser = SimpleDateFormat("hh:mm a", Locale.getDefault())
+                val currentTime = parser.parse(format)?.time
+                val deadlineTaskTime = parser.parse(taskTime)?.time
+                if (currentTime != null && deadlineTaskTime != null) {
+                    when {
+                        currentTime < deadlineTaskTime -> status = 2
+                        currentTime > deadlineTaskTime ->
+                            status = 2
+
+                        else -> status = 0
+                    }
+                }
+
+                val simNew = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+                val formatNew = simNew.format(Date())
                 val model = TaskModel(
-                    0, 0,
+                    0, status,
                     taskEt.text.toString().trim(),
                     timeEt.text.toString().trim(),
+                    formatNew
                 )
                 taskViewModel.insertTask(model)
                 Toast.makeText(context, "Task inserted successfully", Toast.LENGTH_LONG).show()
@@ -219,33 +244,6 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.sort_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        when (item.itemId) {
-            R.id.completed ->
-                if (localList.isNotEmpty()) {
-//                    localList.sortedBy { it.status == 1 }
-//                    setAdapter(localList)
-                    showSortBottomDialog()
-                    return true
-                }
-
-            R.id.pending ->
-                if (localList.isNotEmpty()) {
-
-
-                    return true
-                }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun showSortBottomDialog() {
 
         val view = layoutInflater.inflate(R.layout.row_sort_list, null)
@@ -254,25 +252,35 @@ class MainActivity : AppCompatActivity() {
         bottomSheetDialog.setCancelable(false)
         bottomSheetDialog.setContentView(view)
 
+        val allDateTv = view.findViewById<AppCompatTextView>(R.id.allDateTv)
         val completedTv = view.findViewById<AppCompatTextView>(R.id.completedTv)
         val pendingTv = view.findViewById<AppCompatTextView>(R.id.pendingTv)
         val cancelTv = view.findViewById<AppCompatTextView>(R.id.cancelTv)
 
-
-        completedTv.setOnClickListener {
+        allDateTv.setOnClickListener {
 
             if (localList.isNotEmpty()) {
-                val sortedBy = localList.sortedBy { it.status == 0 }
+                setAdapter(localList)
+            }
+            bottomSheetDialog.dismiss()
+        }
+
+        completedTv.setOnClickListener {
+            val simNew = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+            val formatNew = simNew.format(Date())
+            if (localList.isNotEmpty()) {
+                val sortedBy = localList.filter { it.date == formatNew }
                 setAdapter(sortedBy)
             }
             bottomSheetDialog.dismiss()
         }
         pendingTv.setOnClickListener {
+            val simNew = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+            val formatNew = simNew.format(Date())
             if (localList.isNotEmpty()) {
-                val sortedBy = localList.sortedBy { it.status == 1 }
+                val sortedBy = localList.filter { it.date != formatNew }
                 setAdapter(sortedBy)
             }
-            bottomSheetDialog.dismiss()
             bottomSheetDialog.dismiss()
         }
 
